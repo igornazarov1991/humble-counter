@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -48,6 +50,8 @@ class Counter with ChangeNotifier {
   bool isLoadingFact = false;
   bool isTimerOn = false;
 
+  Timer? _timer;
+
   void decrement() {
     value --;
     notifyListeners();
@@ -56,6 +60,23 @@ class Counter with ChangeNotifier {
   void increment() {
     value ++;
     notifyListeners();
+  }
+
+  void toggleTimer() {
+    isTimerOn = !isTimerOn;
+    notifyListeners();
+
+    if (isTimerOn) {
+      _timer = Timer.periodic(
+          const Duration(seconds: 1),
+              (timer) {
+            value ++;
+            notifyListeners();
+          }
+      );
+    } else {
+      _timer?.cancel();
+    }
   }
 }
 
@@ -76,26 +97,27 @@ class _CounterPageState extends State<CounterPage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: Column(
-        children: [
-          Consumer<Counter>(
-            builder: (context, counter, child) => Text('${counter.value}'),
+      body: Container(
+        padding: const EdgeInsets.all(20),
+        child: Consumer<Counter>(
+          builder: (context, counter, child) => Column(
+            children: [
+              Text('${counter.value}'),
+              TextButton(
+                onPressed: counter.decrement,
+                child: const Text('Decrement'),
+              ),
+              TextButton(
+                onPressed: counter.increment,
+                child: const Text('Increment'),
+              ),
+              TextButton(
+                onPressed: counter.toggleTimer,
+                child: Text(counter.isTimerOn ? 'Stop timer' : 'Start timer'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () {
-              var counter = context.read<Counter>();
-              counter.decrement();
-            },
-            child: const Text('Decrement'),
-          ),
-          TextButton(
-            onPressed: () {
-              var counter = context.read<Counter>();
-              counter.increment();
-            },
-            child: const Text('Increment'),
-          ),
-        ],
+        ),
       ),
     );
   }
