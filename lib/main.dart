@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(
@@ -15,32 +17,27 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a blue toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
       home: const CounterPage(title: 'Humble Counter'),
     );
+  }
+}
+
+Future<String> fetchFact(int number) async {
+  final response = await http
+      .get(Uri.parse('http://www.numbersapi.com/$number'));
+
+  if (response.statusCode == 200) {
+    return response.body;
+  } else {
+    throw Exception('Failed to load fact');
   }
 }
 
@@ -53,12 +50,31 @@ class Counter with ChangeNotifier {
   Timer? _timer;
 
   void decrement() {
-    value --;
+    value -= 1;
+    fact = null;
     notifyListeners();
   }
 
   void increment() {
-    value ++;
+    value += 1;
+    fact = null;
+    notifyListeners();
+  }
+
+  void getFact() async {
+    fact = null;
+    isLoadingFact = true;
+    notifyListeners();
+
+    try {
+      fact = await fetchFact(value);
+    } catch (error) {
+      if (kDebugMode) {
+        print(error);
+      }
+    }
+
+    isLoadingFact = false;
     notifyListeners();
   }
 
@@ -67,13 +83,10 @@ class Counter with ChangeNotifier {
     notifyListeners();
 
     if (isTimerOn) {
-      _timer = Timer.periodic(
-          const Duration(seconds: 1),
-              (timer) {
-            value ++;
-            notifyListeners();
-          }
-      );
+      _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        value++;
+        notifyListeners();
+      });
     } else {
       _timer?.cancel();
     }
@@ -110,6 +123,20 @@ class _CounterPageState extends State<CounterPage> {
               TextButton(
                 onPressed: counter.increment,
                 child: const Text('Increment'),
+              ),
+              Column(
+                children: [
+                  Row(
+                    children: [
+                      TextButton(
+                        onPressed: counter.getFact,
+                        child: const Text('Get fact'),
+                      ),
+                      if (counter.isLoadingFact) const CircularProgressIndicator(),
+                    ],
+                  ),
+                  if (counter.fact != null) Text('${counter.fact}'),
+                ],
               ),
               TextButton(
                 onPressed: counter.toggleTimer,
