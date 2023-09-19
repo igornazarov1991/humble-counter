@@ -5,6 +5,28 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
+abstract final class AppColors {
+  static const Color mainBackground = Color.fromRGBO(21, 28, 36, 1.0);
+  static const Color secondaryBackground = Color.fromRGBO(0, 74, 121, 1.0);
+}
+
+abstract final class AppInsets {
+  static const EdgeInsets standard = EdgeInsets.all(16);
+}
+
+abstract final class Constants {
+  static const BorderRadius standardRadius = BorderRadius.all(Radius.circular(10));
+}
+
+abstract final class Styles {
+  static ButtonStyle textButtonStyle = TextButton.styleFrom(
+    foregroundColor: Colors.white,
+    textStyle: const TextStyle(
+      fontSize: 20,
+    ),
+  );
+}
+
 void main() {
   runApp(
     ChangeNotifierProvider(
@@ -22,7 +44,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
       home: const CounterPage(title: 'Humble Counter'),
@@ -67,6 +88,7 @@ class Counter with ChangeNotifier {
     notifyListeners();
 
     try {
+      await Future.delayed(const Duration(milliseconds: 500));
       fact = await fetchFact(value);
     } catch (error) {
       if (kDebugMode) {
@@ -107,43 +129,121 @@ class _CounterPageState extends State<CounterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: AppColors.mainBackground,
+        foregroundColor: Colors.white,
         title: Text(widget.title),
       ),
-      body: Container(
-        padding: const EdgeInsets.all(20),
-        child: Consumer<Counter>(
-          builder: (context, counter, child) => Column(
-            children: [
-              Text('${counter.value}'),
-              TextButton(
-                onPressed: counter.decrement,
-                child: const Text('Decrement'),
+      backgroundColor: AppColors.mainBackground,
+      body: Consumer<Counter>(
+        builder: (context, counter, child) => Column(
+          children: [
+            Text(
+              '${counter.value}',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 50,
               ),
-              TextButton(
-                onPressed: counter.increment,
-                child: const Text('Increment'),
-              ),
-              Column(
+            ),
+            _Section(
+              child: Column(
                 children: [
                   Row(
                     children: [
                       TextButton(
+                        style: Styles.textButtonStyle,
+                        onPressed: counter.decrement,
+                        child: const Text('Decrement'),
+                      ),
+                      const Spacer(),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      TextButton(
+                        style: Styles.textButtonStyle,
+                        onPressed: counter.increment,
+                        child: const Text('Increment'),
+                      ),
+                      const Spacer(),
+                    ],
+                  ),
+                ],
+              )
+            ),
+            _Section(
+              child: Row(
+                children: [
+                  TextButton(
+                    style: Styles.textButtonStyle,
+                    onPressed: counter.toggleTimer,
+                    child: Text(counter.isTimerOn ? 'Stop timer' : 'Start timer'),
+                  ),
+                  const Spacer(),
+                ],
+              ),
+            ),
+            _Section(
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      TextButton(
+                        style: Styles.textButtonStyle,
                         onPressed: counter.getFact,
                         child: const Text('Get fact'),
                       ),
-                      if (counter.isLoadingFact) const CircularProgressIndicator(),
+                      if (counter.isLoadingFact)
+                        _ActivityIndicator(),
                     ],
                   ),
-                  if (counter.fact != null) Text('${counter.fact}'),
+                  if (counter.fact != null) Text(
+                    '"${counter.fact}"',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
                 ],
-              ),
-              TextButton(
-                onPressed: counter.toggleTimer,
-                child: Text(counter.isTimerOn ? 'Stop timer' : 'Start timer'),
-              ),
-            ],
-          ),
+              )
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Section extends StatelessWidget {
+  final Widget child;
+
+  const _Section({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: AppInsets.standard,
+      child: Container(
+        padding: AppInsets.standard,
+        decoration: const BoxDecoration(
+          borderRadius: Constants.standardRadius,
+          color: AppColors.secondaryBackground,
+        ),
+        child: child,
+      ),
+    );
+  }
+}
+
+class _ActivityIndicator extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox(
+      height: 20.0,
+      width: 20.0,
+      child: Center(
+        child: CircularProgressIndicator(
+          strokeWidth: 3.0,
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
         ),
       ),
     );
