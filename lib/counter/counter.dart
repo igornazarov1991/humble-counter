@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:humble_counter/facts/fact.dart';
@@ -19,6 +20,18 @@ class Counter with ChangeNotifier {
 
   void increment() {
     value += 1;
+    fact = null;
+    notifyListeners();
+  }
+
+  void randomize() {
+    value = Random().nextInt(1000);
+    fact = null;
+    notifyListeners();
+  }
+
+  void zero() {
+    value = 0;
     fact = null;
     notifyListeners();
   }

@@ -73,6 +73,14 @@ class _CounterPageState extends State<CounterPage> {
                 onPressed: counter.increment,
                 title: const Text('Increment'),
             ),
+            _ActionButton(
+              onPressed: counter.randomize,
+              title: const Text('Random'),
+            ),
+            _ActionButton(
+              onPressed: counter.zero,
+              title: const Text('Zero'),
+            ),
           ],
         ),
     );
@@ -132,7 +140,9 @@ class _CounterPageState extends State<CounterPage> {
     final fact = counter.fact;
     if (fact == null) { return; }
     final factToSave = Fact(number: counter.value, fact: fact);
-    Provider.of<FactsContainer>(context, listen: false).writeFact(factToSave);
+    Provider.of<FactsContainer>(context, listen: false).addFact(factToSave);
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text('Fact saved')));
   }
 }
 

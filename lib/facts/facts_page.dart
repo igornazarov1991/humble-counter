@@ -5,9 +5,15 @@ import 'package:humble_counter/facts/facts_container.dart';
 import 'package:provider/provider.dart';
 
 class _FactsListItem extends StatelessWidget {
-  _FactsListItem({required this.fact}) : super(key: ObjectKey(fact));
+  _FactsListItem({
+    required this.fact,
+    required this.isRemoving,
+    required this.onRemove,
+  }) : super(key: ObjectKey(fact));
 
   final Fact fact;
+  final bool isRemoving;
+  final VoidCallback onRemove;
 
   @override
   Widget build(BuildContext context) {
@@ -17,11 +23,22 @@ class _FactsListItem extends StatelessWidget {
         borderRadius: Constants.standardRadius,
         color: AppColors.secondaryBackground,
       ),
-      child: Text(
-          fact.fact,
-          style: const TextStyle(
-            color: Colors.white,
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              fact.fact,
+              style: const TextStyle(
+                color: Colors.white,
+              ),
+            ),
           ),
+          if (isRemoving) IconButton(
+            icon: const Icon(Icons.delete_outline),
+            color: Colors.white,
+            onPressed: () { onRemove(); },
+          ),
+        ],
       ),
     );
   }
@@ -35,14 +52,12 @@ class FactsPage extends StatefulWidget {
 }
 
 class _FactsPageState extends State<FactsPage> {
+  bool isRemoving = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppColors.mainBackground,
-        foregroundColor: Colors.white,
-        title: const Text('Facts'),
-      ),
+      appBar: _buildAppBar(),
       backgroundColor: AppColors.mainBackground,
       body: Consumer<FactsContainer>(
         builder: (context, container, child) {
@@ -52,7 +67,15 @@ class _FactsPageState extends State<FactsPage> {
               itemCount: container.items.length,
               itemBuilder: (BuildContext context, int index) {
                 final fact = container.items[index];
-                return _FactsListItem(fact: fact);
+                return Dismissible(
+                  key: ObjectKey(fact),
+                  onDismissed: (direction) { removeAt(index); },
+                  child: _FactsListItem(
+                    fact: fact,
+                    isRemoving: isRemoving,
+                    onRemove: () { removeAt(index); },
+                  ),
+                );
               },
               separatorBuilder: (BuildContext context, int index) =>
                 const SizedBox(height: 30),
@@ -62,6 +85,22 @@ class _FactsPageState extends State<FactsPage> {
           }
         },
       ),
+    );
+  }
+
+  PreferredSizeWidget _buildAppBar() {
+    return AppBar(
+      backgroundColor: AppColors.mainBackground,
+      foregroundColor: Colors.white,
+      title: const Text('Facts'),
+      actions: [
+        IconButton(
+          icon: Icon(isRemoving ? Icons.delete : Icons.delete_outline),
+          onPressed: () {
+            setState(() { isRemoving = !isRemoving; });
+          },
+        ),
+      ],
     );
   }
 
@@ -75,5 +114,11 @@ class _FactsPageState extends State<FactsPage> {
         ),
       ),
     );
+  }
+
+  void removeAt(int index) {
+    Provider.of<FactsContainer>(context, listen: false).removeAt(index);
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text('Fact removed')));
   }
 }

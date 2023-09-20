@@ -27,19 +27,29 @@ class FactsContainer extends ChangeNotifier {
     notifyListeners();
   }
 
-  void writeFact(Fact fact) async {
+  void write() async {
+    try {
+      final file = await localFile;
+      String json = jsonEncode(_items);
+      file.writeAsString(json);
+    } catch (error) {
+      if (kDebugMode) { print(error); }
+    }
+  }
+
+  void addFact(Fact fact) {
     if (_items.map((item) => item.number).toList().contains(fact.number)) {
       return;
     }
 
-    try {
-      _items.add(fact);
-      final file = await localFile;
-      String json = jsonEncode(_items);
-      file.writeAsString(json);
-      notifyListeners();
-    } catch (error) {
-      if (kDebugMode) { print(error); }
-    }
+    _items.add(fact);
+    notifyListeners();
+    write();
+  }
+
+  void removeAt(int index) {
+    _items.removeAt(index);
+    notifyListeners();
+    write();
   }
 }
