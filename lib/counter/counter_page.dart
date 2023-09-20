@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:humble_counter/facts/facts_container.dart';
 import 'package:provider/provider.dart';
 import 'package:humble_counter/counter/counter.dart';
 import 'package:humble_counter/configs.dart';
+import 'package:humble_counter/facts/fact.dart';
 import 'package:humble_counter/facts/facts_page.dart';
 
 class CounterPage extends StatefulWidget {
@@ -107,7 +109,9 @@ class _CounterPageState extends State<CounterPage> {
                           children: [
                             TextButton(
                               style: Styles.textButtonStyle,
-                              onPressed: counter.saveFact,
+                              onPressed: () {
+                                _saveFact(counter: counter);
+                              },
                               child: const Text('Save'),
                             ),
                           ],
@@ -129,6 +133,13 @@ class _CounterPageState extends State<CounterPage> {
         builder: (context) => const FactsPage(),
       ),
     );
+  }
+
+  void _saveFact({required Counter counter}) {
+    final fact = counter.fact;
+    if (fact == null) { return; }
+    final factToSave = Fact(number: counter.value, fact: fact);
+    Provider.of<FactsContainer>(context, listen: false).writeFact(factToSave);
   }
 }
 

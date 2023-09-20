@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:json_annotation/json_annotation.dart';
@@ -37,10 +36,4 @@ Future<String> get localPath async {
 Future<File> get localFile async {
   final path = await localPath;
   return File('$path/counter.txt');
-}
-
-Future<File> writeFact(Fact fact) async {
-  final file = await localFile;
-  String json = jsonEncode(fact);
-  return file.writeAsString(json);
 }

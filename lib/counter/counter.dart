@@ -7,7 +7,6 @@ class Counter with ChangeNotifier {
   int value = 0;
   String? fact;
   bool isLoadingFact = false;
-  bool isSavingFact = false;
   bool isTimerOn = false;
 
   Timer? _timer;
@@ -42,19 +41,9 @@ class Counter with ChangeNotifier {
     notifyListeners();
   }
 
-  void saveFact() {
-    final factString = fact;
-    if (factString != null) {
-      isSavingFact = true;
-      notifyListeners();
-
-      final factToWrite = Fact(number: value, fact: factString);
-      writeFact(factToWrite);
-    }
-  }
-
   void toggleTimer() {
     isTimerOn = !isTimerOn;
+    fact = null;
     notifyListeners();
 
     if (isTimerOn) {
