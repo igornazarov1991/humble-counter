@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:humble_counter/counter.dart';
+import 'package:humble_counter/counter/counter.dart';
+import 'package:humble_counter/counter/counter_page.dart';
 
 void main() {
   runApp(
