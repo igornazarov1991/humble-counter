@@ -3,24 +3,15 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
 import 'package:humble_counter/configs.dart';
-
-Future<String> fetchFact(int number) async {
-  final response = await http
-      .get(Uri.parse('http://www.numbersapi.com/$number'));
-
-  if (response.statusCode == 200) {
-    return response.body;
-  } else {
-    throw Exception('Failed to load fact');
-  }
-}
+import 'package:humble_counter/fact.dart';
+import 'package:humble_counter/facts_page.dart';
 
 class Counter with ChangeNotifier {
   int value = 0;
   String? fact;
   bool isLoadingFact = false;
+  bool isSavingFact = false;
   bool isTimerOn = false;
 
   Timer? _timer;
@@ -55,6 +46,17 @@ class Counter with ChangeNotifier {
     notifyListeners();
   }
 
+  void saveFact() {
+    final factString = fact;
+    if (factString != null) {
+      isSavingFact = true;
+      notifyListeners();
+
+      final factToWrite = Fact(number: value, fact: factString);
+      writeFact(factToWrite);
+    }
+  }
+
   void toggleTimer() {
     isTimerOn = !isTimerOn;
     notifyListeners();
@@ -87,6 +89,15 @@ class _CounterPageState extends State<CounterPage> {
         backgroundColor: AppColors.mainBackground,
         foregroundColor: Colors.white,
         title: Text(widget.title),
+        actions: [
+          TextButton(
+            style: Styles.textButtonStyle,
+            onPressed: () {
+              _showFacts(context);
+            },
+            child: const Text('Facts'),
+          )
+        ],
       ),
       backgroundColor: AppColors.mainBackground,
       body: Consumer<Counter>(
@@ -151,18 +162,39 @@ class _CounterPageState extends State<CounterPage> {
                           _ActivityIndicator(),
                       ],
                     ),
-                    if (counter.fact != null) Text(
-                      '"${counter.fact}"',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontStyle: FontStyle.italic,
-                      ),
+                    if (counter.fact != null) Column(
+                      children: [
+                        Text(
+                          '"${counter.fact}"',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            TextButton(
+                              style: Styles.textButtonStyle,
+                              onPressed: counter.saveFact,
+                              child: const Text('Save'),
+                            ),
+                          ],
+                        )
+                      ],
                     ),
                   ],
                 )
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showFacts(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const FactsPage(),
       ),
     );
   }
