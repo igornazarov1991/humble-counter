@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:json_annotation/json_annotation.dart';
 import 'package:http/http.dart' as http;
+import 'package:json_annotation/json_annotation.dart';
 import 'package:path_provider/path_provider.dart';
 
 part 'fact.g.dart';

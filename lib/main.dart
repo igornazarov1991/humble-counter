@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:humble_counter/counter/counter.dart';
 import 'package:humble_counter/counter/counter_page.dart';
 import 'package:humble_counter/facts/facts_container.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(
@@ -12,7 +12,7 @@ void main() {
         ChangeNotifierProvider(create: (context) => FactsContainer()),
       ],
       child: const MyApp(),
-    )
+    ),
   );
 }
 

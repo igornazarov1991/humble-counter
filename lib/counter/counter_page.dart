@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:humble_counter/facts/facts_container.dart';
-import 'package:provider/provider.dart';
-import 'package:humble_counter/counter/counter.dart';
 import 'package:humble_counter/configs.dart';
+import 'package:humble_counter/counter/counter.dart';
 import 'package:humble_counter/facts/fact.dart';
+import 'package:humble_counter/facts/facts_container.dart';
 import 'package:humble_counter/facts/facts_page.dart';
+import 'package:provider/provider.dart';
 
 class CounterPage extends StatefulWidget {
   const CounterPage({super.key, required this.title,});
@@ -19,111 +19,104 @@ class _CounterPageState extends State<CounterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppColors.mainBackground,
-        foregroundColor: Colors.white,
-        title: Text(widget.title),
-        actions: [
-          TextButton(
-            style: Styles.textButtonStyle,
-            onPressed: () {
-              _showFacts(context);
-            },
-            child: const Text('Facts'),
-          )
-        ],
-      ),
+      appBar: _buildAppBar(),
       backgroundColor: AppColors.mainBackground,
       body: Consumer<Counter>(
         builder: (context, counter, child) => Column(
           children: [
-            Text(
-              '${counter.value}',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 50,
-              ),
-            ),
-            _Section(
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        TextButton(
-                          style: Styles.textButtonStyle,
-                          onPressed: counter.decrement,
-                          child: const Text('Decrement'),
-                        ),
-                        const Spacer(),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        TextButton(
-                          style: Styles.textButtonStyle,
-                          onPressed: counter.increment,
-                          child: const Text('Increment'),
-                        ),
-                        const Spacer(),
-                      ],
-                    ),
-                  ],
-                )
-            ),
-            _Section(
-              child: Row(
-                children: [
-                  TextButton(
-                    style: Styles.textButtonStyle,
-                    onPressed: counter.toggleTimer,
-                    child: Text(counter.isTimerOn ? 'Stop timer' : 'Start timer'),
-                  ),
-                  const Spacer(),
-                ],
-              ),
-            ),
-            _Section(
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        TextButton(
-                          style: Styles.textButtonStyle,
-                          onPressed: counter.getFact,
-                          child: const Text('Get fact'),
-                        ),
-                        if (counter.isLoadingFact)
-                          _ActivityIndicator(),
-                      ],
-                    ),
-                    if (counter.fact != null) Column(
-                      children: [
-                        Text(
-                          '"${counter.fact}"',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontStyle: FontStyle.italic,
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            TextButton(
-                              style: Styles.textButtonStyle,
-                              onPressed: () {
-                                _saveFact(counter: counter);
-                              },
-                              child: const Text('Save'),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                  ],
-                )
-            ),
+            _buildCounterDisplay(counter),
+            _buildCounterChanger(counter),
+            _buildTimer(counter),
+            _buildFact(counter),
           ],
         ),
       ),
+    );
+  }
+
+  PreferredSizeWidget _buildAppBar() {
+    return AppBar(
+      backgroundColor: AppColors.mainBackground,
+      foregroundColor: Colors.white,
+      title: Text(widget.title),
+      actions: [
+        TextButton(
+          style: Styles.textButtonStyle,
+          onPressed: () {
+            _showFacts(context);
+          },
+          child: const Text('Facts'),
+        ),
+      ],
+    );
+  }
+  
+  Widget _buildCounterDisplay(Counter counter) {
+    return Text(
+      '${counter.value}',
+      style: const TextStyle(
+        color: Colors.white,
+        fontSize: 50,
+      ),
+    );
+  }
+  
+  Widget _buildCounterChanger(Counter counter) {
+    return _Section(
+        child: Column(
+          children: [
+            _ActionButton(
+              onPressed: counter.decrement,
+              title: const Text('Decrement'),
+            ),
+            _ActionButton(
+                onPressed: counter.increment,
+                title: const Text('Increment'),
+            ),
+          ],
+        ),
+    );
+  }
+  
+  Widget _buildTimer(Counter counter) {
+    return _Section(
+      child: _ActionButton(
+        onPressed: counter.toggleTimer,
+        title: Text(counter.isTimerOn ? 'Stop timer' : 'Start timer'),
+      ),
+    );
+  }
+  
+  Widget _buildFact(Counter counter) {
+    return _Section(
+        child: Column(
+          children: [
+            _ActionButton(
+              onPressed: counter.getFact,
+              title: const Text('Get fact'),
+              hasActivityIndicator: counter.isLoadingFact,
+            ),
+            if (counter.fact != null) _buildFactDisplay(counter),
+          ],
+        ),
+    );
+  }
+  
+  Widget _buildFactDisplay(Counter counter) {
+    return Column(
+      children: [
+        Text(
+          '"${counter.fact}"',
+          style: const TextStyle(
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(height: 20),
+        _ActionButton(
+          onPressed: () { _saveFact(counter: counter); },
+          title: const Text('Save'),
+        ),
+      ],
     );
   }
 
@@ -143,10 +136,37 @@ class _CounterPageState extends State<CounterPage> {
   }
 }
 
-class _Section extends StatelessWidget {
-  final Widget child;
+class _ActionButton extends StatelessWidget {
+  const _ActionButton({
+    required this.onPressed,
+    required this.title,
+    this.hasActivityIndicator = false,
+  });
 
+  final VoidCallback onPressed;
+  final Widget title;
+  final bool hasActivityIndicator;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        TextButton(
+          style: Styles.textButtonStyle,
+          onPressed: onPressed,
+          child: title,
+        ),
+        const Spacer(),
+        if (hasActivityIndicator == true) _ActivityIndicator(),
+      ],
+    );
+  }
+}
+
+class _Section extends StatelessWidget {
   const _Section({required this.child});
+
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {

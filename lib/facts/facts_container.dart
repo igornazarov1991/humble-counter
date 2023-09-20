@@ -28,6 +28,10 @@ class FactsContainer extends ChangeNotifier {
   }
 
   void writeFact(Fact fact) async {
+    if (_items.map((item) => item.number).toList().contains(fact.number)) {
+      return;
+    }
+
     try {
       _items.add(fact);
       final file = await localFile;

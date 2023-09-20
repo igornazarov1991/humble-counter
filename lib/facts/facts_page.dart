@@ -1,7 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:humble_counter/configs.dart';
+import 'package:humble_counter/facts/fact.dart';
 import 'package:humble_counter/facts/facts_container.dart';
+import 'package:provider/provider.dart';
+
+class _FactsListItem extends StatelessWidget {
+  _FactsListItem({required this.fact}) : super(key: ObjectKey(fact));
+
+  final Fact fact;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: AppInsets.standard,
+      decoration: const BoxDecoration(
+        borderRadius: Constants.standardRadius,
+        color: AppColors.secondaryBackground,
+      ),
+      child: Text(
+          fact.fact,
+          style: const TextStyle(
+            color: Colors.white,
+          ),
+      ),
+    );
+  }
+}
 
 class FactsPage extends StatefulWidget {
   const FactsPage({super.key});
@@ -28,36 +52,27 @@ class _FactsPageState extends State<FactsPage> {
               itemCount: container.items.length,
               itemBuilder: (BuildContext context, int index) {
                 final fact = container.items[index];
-                return Container(
-                  padding: AppInsets.standard,
-                  decoration: const BoxDecoration(
-                    borderRadius: Constants.standardRadius,
-                    color: AppColors.secondaryBackground,
-                  ),
-                  child: Text(
-                      fact.fact,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        // fontSize: 30,
-                      )
-                  ),
-                );
+                return _FactsListItem(fact: fact);
               },
               separatorBuilder: (BuildContext context, int index) =>
                 const SizedBox(height: 30),
             );
           } else {
-            return const Center(
-              child: Text(
-                'No facts',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 30,
-                ),
-              ),
-            );
+            return _buildEmptyList();
           }
-        }
+        },
+      ),
+    );
+  }
+
+  Widget _buildEmptyList() {
+    return const Center(
+      child: Text(
+        'No facts',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 30,
+        ),
       ),
     );
   }
