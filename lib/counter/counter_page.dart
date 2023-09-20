@@ -6,6 +6,8 @@ import 'package:humble_counter/facts/facts_container.dart';
 import 'package:humble_counter/facts/facts_page.dart';
 import 'package:provider/provider.dart';
 
+import '../info/info_page.dart';
+
 class CounterPage extends StatefulWidget {
   const CounterPage({super.key, required this.title,});
 
@@ -39,13 +41,14 @@ class _CounterPageState extends State<CounterPage> {
       backgroundColor: AppColors.mainBackground,
       foregroundColor: Colors.white,
       title: Text(widget.title),
+      leading: IconButton(
+        icon: const Icon(Icons.info_outline),
+        onPressed: () { _showInfo(context); },
+      ),
       actions: [
-        TextButton(
-          style: Styles.textButtonStyle,
-          onPressed: () {
-            _showFacts(context);
-          },
-          child: const Text('Facts'),
+        IconButton(
+          icon: const Icon(Icons.list),
+          onPressed: () { _showFacts(context); },
         ),
       ],
     );
@@ -143,6 +146,15 @@ class _CounterPageState extends State<CounterPage> {
     Provider.of<FactsContainer>(context, listen: false).addFact(factToSave);
     ScaffoldMessenger.of(context)
         .showSnackBar(const SnackBar(content: Text('Fact saved')));
+  }
+
+  void _showInfo(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const InfoPage(),
+        fullscreenDialog: true,
+      ),
+    );
   }
 }
 
