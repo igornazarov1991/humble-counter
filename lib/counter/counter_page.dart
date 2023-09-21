@@ -29,6 +29,7 @@ class _CounterPageState extends State<CounterPage> {
             _buildCounterChanger(counter),
             _buildTimer(counter),
             _buildFact(counter),
+            _buildPrimerVerifier(counter),
           ],
         ),
       ),
@@ -127,6 +128,15 @@ class _CounterPageState extends State<CounterPage> {
     );
   }
 
+  Widget _buildPrimerVerifier(Counter counter) {
+    return _Section(
+      child: _ActionButton(
+        onPressed: () { checkIsPrime(counter); },
+        title: const Text('Is prime?'),
+      ),
+    );
+  }
+
   void _showFacts(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -149,6 +159,28 @@ class _CounterPageState extends State<CounterPage> {
       MaterialPageRoute(
         builder: (context) => const InfoPage(),
         fullscreenDialog: true,
+      ),
+    );
+  }
+
+  void checkIsPrime(Counter counter) async {
+    Future.delayed(const Duration(milliseconds: 1000));
+
+    final isPrime = counter.isPrime();
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: Text(
+          isPrime
+              ? '${counter.value} is a prime number'
+              : '${counter.value} is not a prime number',
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'OK'),
+            child: const Text('OK'),
+          ),
+        ],
       ),
     );
   }

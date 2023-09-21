@@ -68,4 +68,13 @@ class Counter with ChangeNotifier {
       _timer?.cancel();
     }
   }
+
+  bool isPrime() {
+    if (value <= 1) { return false; }
+    if (value <= 3) { return true; }
+    for (var i = 2; i <= sqrt(value).toInt(); i++) {
+      if (value % i == 0) { return false; }
+    }
+    return true;
+  }
 }
