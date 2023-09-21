@@ -19,23 +19,17 @@ class _FactsListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: AppInsets.standard,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         borderRadius: Constants.standardRadius,
-        color: AppColors.secondaryBackground,
+        color: Theme.of(context).colorScheme.primary,
       ),
       child: Row(
         children: [
           Expanded(
-            child: Text(
-              fact.fact,
-              style: const TextStyle(
-                color: Colors.white,
-              ),
-            ),
+            child: Text(fact.fact),
           ),
           if (isRemoving) IconButton(
             icon: const Icon(Icons.delete_outline),
-            color: Colors.white,
             onPressed: () { onRemove(); },
           ),
         ],
@@ -58,7 +52,6 @@ class _FactsPageState extends State<FactsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(),
-      backgroundColor: AppColors.mainBackground,
       body: Consumer<FactsContainer>(
         builder: (context, container, child) {
           if (container.items.isNotEmpty) {
@@ -90,8 +83,7 @@ class _FactsPageState extends State<FactsPage> {
 
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
-      backgroundColor: AppColors.mainBackground,
-      foregroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.background,
       title: const Text('Facts'),
       actions: [
         IconButton(
@@ -109,7 +101,6 @@ class _FactsPageState extends State<FactsPage> {
       child: Text(
         'No facts',
         style: TextStyle(
-          color: Colors.white,
           fontSize: 30,
         ),
       ),

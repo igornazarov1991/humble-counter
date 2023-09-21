@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 abstract final class AppColors {
-  static const Color mainBackground = Color.fromRGBO(21, 28, 36, 1.0);
-  static const Color secondaryBackground = Color.fromRGBO(0, 74, 121, 1.0);
+  static const Color background = Color.fromRGBO(21, 28, 36, 1.0);
+  static const Color primary = Color.fromRGBO(0, 74, 121, 1.0);
 }
 
 abstract final class AppInsets {
-  static const EdgeInsets standard = EdgeInsets.all(16);
+  static const EdgeInsets standard = EdgeInsets.all(12);
 }
 
 abstract final class Constants {

@@ -22,7 +22,6 @@ class _CounterPageState extends State<CounterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(),
-      backgroundColor: AppColors.mainBackground,
       body: Consumer<Counter>(
         builder: (context, counter, child) => Column(
           children: [
@@ -38,8 +37,7 @@ class _CounterPageState extends State<CounterPage> {
 
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
-      backgroundColor: AppColors.mainBackground,
-      foregroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.background,
       title: Text(widget.title),
       leading: IconButton(
         icon: const Icon(Icons.info_outline),
@@ -58,7 +56,6 @@ class _CounterPageState extends State<CounterPage> {
     return Text(
       '${counter.value}',
       style: const TextStyle(
-        color: Colors.white,
         fontSize: 50,
       ),
     );
@@ -116,13 +113,10 @@ class _CounterPageState extends State<CounterPage> {
   Widget _buildFactDisplay(Counter counter) {
     return Column(
       children: [
-        Text(
-          '"${counter.fact}"',
-          style: const TextStyle(
-            color: Colors.white,
-          ),
+        Container(
+          padding: AppInsets.standard,
+          child: Text('"${counter.fact}"'),
         ),
-        const SizedBox(height: 20),
         _ActionButton(
           onPressed: () { _saveFact(counter: counter); },
           title: const Text('Save'),
@@ -196,9 +190,9 @@ class _Section extends StatelessWidget {
       padding: AppInsets.standard,
       child: Container(
         padding: AppInsets.standard,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           borderRadius: Constants.standardRadius,
-          color: AppColors.secondaryBackground,
+          color: Theme.of(context).colorScheme.primary,
         ),
         child: child,
       ),

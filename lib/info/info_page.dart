@@ -1,34 +1,21 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import '../configs.dart';
 
 class InfoPage extends StatelessWidget {
   const InfoPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // return const Center(
-    //   child: Text('Info'),
-    // );
     return Scaffold(
-      appBar: _buildAppBar(),
-      backgroundColor: AppColors.mainBackground,
+      appBar: _buildAppBar(context),
       body: const Center(
-        child: Text(
-          'Content',
-          style: TextStyle(
-            color: Colors.white,
-          ),
-        ),
+        child: Text('Content'),
       ),
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
-      backgroundColor: AppColors.mainBackground,
-      foregroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.background,
       title: const Text('Info'),
     );
   }
