@@ -41,11 +41,13 @@ class _CounterPageState extends State<CounterPage> {
       title: Text(widget.title),
       leading: IconButton(
         icon: const Icon(Icons.info_outline),
+        iconSize: 30,
         onPressed: () { _showInfo(context); },
       ),
       actions: [
         IconButton(
           icon: const Icon(Icons.list),
+          iconSize: 30,
           onPressed: () { _showFacts(context); },
         ),
       ],
