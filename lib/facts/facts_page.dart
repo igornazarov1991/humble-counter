@@ -28,9 +28,13 @@ class _FactsListItem extends StatelessWidget {
           Expanded(
             child: Text(fact.fact),
           ),
-          if (isRemoving) IconButton(
-            icon: const Icon(Icons.delete_outline),
-            onPressed: () { onRemove(); },
+          AnimatedOpacity(
+            opacity: isRemoving ? 1.0 : 0.0,
+            duration: const Duration(milliseconds: 250),
+            child: IconButton(
+              icon: const Icon(Icons.delete_outline),
+              onPressed: () { onRemove(); },
+            ),
           ),
         ],
       ),
