@@ -3,40 +3,34 @@ import 'package:humble_counter/configs.dart';
 import 'package:humble_counter/facts/fact.dart';
 import 'package:humble_counter/facts/facts_container.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 class _FactsListItem extends StatelessWidget {
   _FactsListItem({
     required this.fact,
-    required this.isRemoving,
-    required this.onRemove,
+    required this.onShare,
   }) : super(key: ObjectKey(fact));
 
   final Fact fact;
-  final bool isRemoving;
-  final VoidCallback onRemove;
+  final VoidCallback onShare;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: AppInsets.standard,
-      decoration: BoxDecoration(
-        borderRadius: Constants.standardRadius,
-        color: Theme.of(context).colorScheme.primary,
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(fact.fact),
-          ),
-          AnimatedOpacity(
-            opacity: isRemoving ? 1.0 : 0.0,
-            duration: const Duration(milliseconds: 250),
-            child: IconButton(
-              icon: const Icon(Icons.delete_outline),
-              onPressed: () { onRemove(); },
+    return GestureDetector(
+      onLongPress: () { onShare(); },
+      child: Container(
+        padding: AppInsets.standard,
+        decoration: BoxDecoration(
+          borderRadius: Constants.standardRadius,
+          color: Theme.of(context).colorScheme.primary,
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(fact.fact),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -50,8 +44,6 @@ class FactsPage extends StatefulWidget {
 }
 
 class _FactsPageState extends State<FactsPage> {
-  bool isRemoving = false;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,8 +61,7 @@ class _FactsPageState extends State<FactsPage> {
                   onDismissed: (direction) { removeAt(index); },
                   child: _FactsListItem(
                     fact: fact,
-                    isRemoving: isRemoving,
-                    onRemove: () { removeAt(index); },
+                    onShare: () { shareAt(index); },
                   ),
                 );
               },
@@ -89,14 +80,6 @@ class _FactsPageState extends State<FactsPage> {
     return AppBar(
       backgroundColor: Theme.of(context).colorScheme.background,
       title: const Text('Facts'),
-      actions: [
-        IconButton(
-          icon: Icon(isRemoving ? Icons.delete : Icons.delete_outline),
-          onPressed: () {
-            setState(() { isRemoving = !isRemoving; });
-          },
-        ),
-      ],
     );
   }
 
@@ -115,5 +98,10 @@ class _FactsPageState extends State<FactsPage> {
     Provider.of<FactsContainer>(context, listen: false).removeAt(index);
     ScaffoldMessenger.of(context)
         .showSnackBar(const SnackBar(content: Text('Fact removed')));
+  }
+
+  void shareAt(int index) {
+    final fact = Provider.of<FactsContainer>(context, listen: false).items[index];
+    Share.share(fact.fact);
   }
 }
