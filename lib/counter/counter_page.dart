@@ -23,13 +23,28 @@ class _CounterPageState extends State<CounterPage> {
     return Scaffold(
       appBar: _buildAppBar(),
       body: Consumer<Counter>(
+        // builder: (context, counter, child) => Column(
+        //   children: [
+        //     _buildCounterDisplay(counter),
+        //     _buildCounterChanger(counter),
+        //     _buildTimer(counter),
+        //     _buildFact(counter),
+        //     _buildPrimerVerifier(counter),
+        //   ],
+        // ),
         builder: (context, counter, child) => Column(
           children: [
             _buildCounterDisplay(counter),
-            _buildCounterChanger(counter),
-            _buildTimer(counter),
-            _buildFact(counter),
-            _buildPrimerVerifier(counter),
+            Expanded(
+              child: ListView(
+                children: [
+                  _buildCounterChanger(counter),
+                  _buildTimer(counter),
+                  _buildFact(counter),
+                  _buildPrimerVerifier(counter),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -68,21 +83,29 @@ class _CounterPageState extends State<CounterPage> {
     return _Section(
         child: Column(
           children: [
-            _ActionButton(
-              onPressed: counter.decrement,
+            ListTile(
+              leading: const Icon(Icons.remove),
               title: const Text('Decrement'),
+              splashColor: Colors.transparent,
+              onTap: counter.decrement,
             ),
-            _ActionButton(
-                onPressed: counter.increment,
-                title: const Text('Increment'),
+            ListTile(
+              leading: const Icon(Icons.add),
+              title: const Text('Increment'),
+              splashColor: Colors.transparent,
+              onTap: counter.increment,
             ),
-            _ActionButton(
-              onPressed: counter.randomize,
+            ListTile(
+              leading: const Icon(Icons.shuffle),
               title: const Text('Random'),
+              splashColor: Colors.transparent,
+              onTap: counter.randomize,
             ),
-            _ActionButton(
-              onPressed: counter.zero,
+            ListTile(
+              leading: const Icon(Icons.exposure_zero),
               title: const Text('Zero'),
+              splashColor: Colors.transparent,
+              onTap: counter.zero,
             ),
           ],
         ),
@@ -91,9 +114,11 @@ class _CounterPageState extends State<CounterPage> {
   
   Widget _buildTimer(Counter counter) {
     return _Section(
-      child: _ActionButton(
-        onPressed: counter.toggleTimer,
+      child: ListTile(
+        leading: const Icon(Icons.timer_outlined),
         title: Text(counter.isTimerOn ? 'Stop timer' : 'Start timer'),
+        splashColor: Colors.transparent,
+        onTap: counter.toggleTimer,
       ),
     );
   }
@@ -102,10 +127,12 @@ class _CounterPageState extends State<CounterPage> {
     return _Section(
         child: Column(
           children: [
-            _ActionButton(
-              onPressed: counter.getFact,
+            ListTile(
+              leading: const Icon(Icons.fact_check_outlined),
+              trailing: counter.isLoadingFact ? _ActivityIndicator() : null,
               title: const Text('Get fact'),
-              hasActivityIndicator: counter.isLoadingFact,
+              splashColor: Colors.transparent,
+              onTap: counter.getFact,
             ),
             if (counter.fact != null) _buildFactDisplay(counter),
           ],
@@ -116,13 +143,12 @@ class _CounterPageState extends State<CounterPage> {
   Widget _buildFactDisplay(Counter counter) {
     return Column(
       children: [
-        Container(
-          padding: AppInsets.standard,
-          child: Text('"${counter.fact}"'),
-        ),
-        _ActionButton(
-          onPressed: () { _saveFact(counter: counter); },
+        Text('"${counter.fact}"'),
+        ListTile(
+          leading: const Icon(Icons.save_outlined),
           title: const Text('Save'),
+          splashColor: Colors.transparent,
+          onTap: () { _saveFact(counter: counter); },
         ),
       ],
     );
@@ -130,9 +156,11 @@ class _CounterPageState extends State<CounterPage> {
 
   Widget _buildPrimerVerifier(Counter counter) {
     return _Section(
-      child: _ActionButton(
-        onPressed: () { checkIsPrime(counter); },
+      child: ListTile(
+        leading: const Icon(Icons.task_outlined),
         title: const Text('Is prime?'),
+        splashColor: Colors.transparent,
+        onTap: () { checkIsPrime(counter); },
       ),
     );
   }
@@ -170,45 +198,14 @@ class _CounterPageState extends State<CounterPage> {
     showDialog<String>(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        title: Text(
+        icon: isPrime ? const Icon(Icons.check) : const Icon(Icons.warning),
+        iconColor: Colors.white,
+        content: Text(
           isPrime
               ? '${counter.value} is a prime number'
               : '${counter.value} is not a prime number',
         ),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.pop(context, 'OK'),
-            child: const Text('OK'),
-          ),
-        ],
       ),
-    );
-  }
-}
-
-class _ActionButton extends StatelessWidget {
-  const _ActionButton({
-    required this.onPressed,
-    required this.title,
-    this.hasActivityIndicator = false,
-  });
-
-  final VoidCallback onPressed;
-  final Widget title;
-  final bool hasActivityIndicator;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        TextButton(
-          style: Styles.textButtonStyle,
-          onPressed: onPressed,
-          child: title,
-        ),
-        const Spacer(),
-        if (hasActivityIndicator == true) _ActivityIndicator(),
-      ],
     );
   }
 }
@@ -222,14 +219,7 @@ class _Section extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: AppInsets.standard,
-      child: Container(
-        padding: AppInsets.standard,
-        decoration: BoxDecoration(
-          borderRadius: Constants.standardRadius,
-          color: Theme.of(context).colorScheme.primary,
-        ),
-        child: child,
-      ),
+      child: child,
     );
   }
 }

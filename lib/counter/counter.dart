@@ -15,29 +15,34 @@ class Counter with ChangeNotifier {
   void decrement() {
     value -= 1;
     fact = null;
+    stopTimerIfNeeded();
     notifyListeners();
   }
 
   void increment() {
     value += 1;
     fact = null;
+    stopTimerIfNeeded();
     notifyListeners();
   }
 
   void randomize() {
     value = Random().nextInt(1000);
     fact = null;
+    stopTimerIfNeeded();
     notifyListeners();
   }
 
   void zero() {
     value = 0;
     fact = null;
+    stopTimerIfNeeded();
     notifyListeners();
   }
 
   void getFact() async {
     fact = null;
+    stopTimerIfNeeded();
     isLoadingFact = true;
     notifyListeners();
 
@@ -69,7 +74,15 @@ class Counter with ChangeNotifier {
     }
   }
 
+  void stopTimerIfNeeded() {
+    isTimerOn = false;
+    _timer?.cancel();
+  }
+
   bool isPrime() {
+    stopTimerIfNeeded();
+    notifyListeners();
+
     if (value <= 1) { return false; }
     if (value <= 3) { return true; }
     for (var i = 2; i <= sqrt(value).toInt(); i++) {
