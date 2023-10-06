@@ -23,15 +23,6 @@ class _CounterPageState extends State<CounterPage> {
     return Scaffold(
       appBar: _buildAppBar(),
       body: Consumer<Counter>(
-        // builder: (context, counter, child) => Column(
-        //   children: [
-        //     _buildCounterDisplay(counter),
-        //     _buildCounterChanger(counter),
-        //     _buildTimer(counter),
-        //     _buildFact(counter),
-        //     _buildPrimerVerifier(counter),
-        //   ],
-        // ),
         builder: (context, counter, child) => Column(
           children: [
             _buildCounterDisplay(counter),
@@ -156,11 +147,22 @@ class _CounterPageState extends State<CounterPage> {
 
   Widget _buildPrimerVerifier(Counter counter) {
     return _Section(
-      child: ListTile(
-        leading: const Icon(Icons.task_outlined),
-        title: const Text('Is prime?'),
-        splashColor: Colors.transparent,
-        onTap: () { checkIsPrime(counter); },
+      child: Column(
+        children: [
+          ListTile(
+            leading: const Icon(Icons.task_outlined),
+            title: const Text('Is this prime?'),
+            splashColor: Colors.transparent,
+            onTap: () { checkIsPrime(counter); },
+          ),
+          ListTile(
+            leading: const Icon(Icons.task_outlined),
+            trailing: counter.isLoadingNthPrime ? _ActivityIndicator() : null,
+            title: Text('What is the ${counter.value.ordinal} prime?'),
+            splashColor: Colors.transparent,
+            onTap: () { checkNthPrime(counter); },
+          ),
+        ],
       ),
     );
   }
@@ -205,6 +207,35 @@ class _CounterPageState extends State<CounterPage> {
               ? '${counter.value} is a prime number'
               : '${counter.value} is not a prime number',
         ),
+      ),
+    );
+  }
+
+  void checkNthPrime(Counter counter) async {
+    if (counter.value <= 0) {
+      showErrorDialog('Counter should be greater than 0 to calculate prime numbers');
+      return;
+    }
+
+    final number = await counter.getNthPrime();
+    final title = 'The ${counter.value.ordinal} prime is $number';
+    showNthPrimeDialog(title);
+  }
+
+  void showErrorDialog(String title) {
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        content: Text(title),
+      ),
+    );
+  }
+
+  void showNthPrimeDialog(String title) {
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        content: Text(title),
       ),
     );
   }
