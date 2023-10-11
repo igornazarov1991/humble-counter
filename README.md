@@ -1,16 +1,10 @@
 # humble_counter
 
-A new Flutter project.
+This is a counting app that allows you to:         
 
-## Getting Started
+* check if a number is prime (a number that is only divisible by 1 and itself) 
+* compute the “nth” prime (this is actually doing an API request to [Wolfram Alpha](https://wolframalpha.com), a scientific computing API)
+* ask for a fact about a number (which actually makes a request to [NumbersAPI](http://numbersapi.com) service for the fact)
+* save and share your favorite facts.
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+The app is inspired by the series of [Point Free](https://pointfree.co) episodes and was born as a result of my first steps of learning [Flutter](https://flutter.dev). 
